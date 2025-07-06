@@ -128,7 +128,8 @@ const authController = {
 
   checkAuth: (req, res) => {
     try {
-      res.status(200).json(req.user);
+      const data = req.user;
+      res.status(200).json(data);
     } catch (error) {
       console.log("Error in checkAuth controller", error);
       return res.status(500).json({ message: "Internal Server Error" });
