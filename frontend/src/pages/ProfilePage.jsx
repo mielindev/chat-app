@@ -19,7 +19,6 @@ const ProfilePage = () => {
     const reader = new FileReader();
 
     reader.readAsDataURL(file);
-    console.log("👉 ~ handleFileChange ~ reader:", reader);
 
     reader.onload = async () => {
       const base64Image = reader.result;

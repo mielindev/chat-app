@@ -37,6 +37,7 @@ const messageController = {
       return res.status(500).json({ message: "Internal Server Error" });
     }
   },
+
   sendMessage: async (req, res) => {
     try {
       const { text, image } = req.body;
@@ -57,7 +58,7 @@ const messageController = {
       });
 
       await newMessage.save();
-      return res.status(200).josn(newMessage);
+      return res.status(200).json(newMessage);
     } catch (error) {
       console.log("Error in sendMessage controller", error);
       return res.status(500).json({ message: "Internal Server Error" });
