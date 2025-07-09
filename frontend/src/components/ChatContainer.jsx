@@ -13,6 +13,8 @@ const ChatContainer = () => {
     isMessageLoading,
     getMessages,
     isSendingMessage,
+    subscribeToMessages,
+    unsubscribeFromMessages,
   } = useChatStore();
 
   const { authUser } = useAuthStore();
@@ -21,7 +23,16 @@ const ChatContainer = () => {
 
   useEffect(() => {
     getMessages(selectedUser._id);
-  }, [getMessages, selectedUser._id]);
+
+    subscribeToMessages();
+
+    return () => unsubscribeFromMessages();
+  }, [
+    getMessages,
+    selectedUser._id,
+    subscribeToMessages,
+    unsubscribeFromMessages,
+  ]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -43,23 +54,27 @@ const ChatContainer = () => {
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((message, index) => {
           const previousMessage = messages[index - 1];
-          console.log("previousMessage", previousMessage?.senderId);
           const isSameSender = previousMessage?.senderId === message.senderId;
           const isSameTime =
             formatMessageTime(previousMessage?.createdAt) ===
             formatMessageTime(message.createdAt);
 
           const showHeader = !isSameSender || !isSameTime;
+
+          const isLastMessage = index === messages.length - 1;
           return (
             <div
               key={message._id}
               className={`chat ${
                 message.senderId === authUser._id ? "chat-end" : "chat-start"
               }`}
+              ref={isLastMessage ? bottomRef : null}
             >
               <div className="chat-image avatar">
-                {showHeader && (
-                  <div className="size-10 rounded-full border">
+                <div
+                  className={`size-10 rounded-full ${showHeader && "border"}`}
+                >
+                  {showHeader && (
                     <img
                       src={
                         message.senderId === authUser._id
@@ -72,8 +87,8 @@ const ChatContainer = () => {
                           : selectedUser.fullName
                       }
                     />
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
 
               {showHeader && (
@@ -95,13 +110,18 @@ const ChatContainer = () => {
                 {message.text && <p>{message.text}</p>}
               </div>
 
-              {/* <div className="chat-footer text-base-content/50">
-              {isSendingMessage ? <span>Sending</span> : <span>Delivered</span>}
-            </div> */}
+              {isLastMessage && message.senderId === authUser._id && (
+                <div className="chat-footer text-base-content/50">
+                  {isSendingMessage ? (
+                    <span>Sending</span>
+                  ) : (
+                    <span>Delivered</span>
+                  )}
+                </div>
+              )}
             </div>
           );
         })}
-        <div ref={bottomRef} />
       </div>
 
       <MessageInput />
