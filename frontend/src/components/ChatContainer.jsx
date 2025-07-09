@@ -59,7 +59,7 @@ const ChatContainer = () => {
             formatMessageTime(previousMessage?.createdAt) ===
             formatMessageTime(message.createdAt);
 
-          const showHeader = !isSameSender || !isSameTime;
+          const showHeader = !isSameSender || isSameTime;
 
           const isLastMessage = index === messages.length - 1;
           return (
@@ -71,10 +71,8 @@ const ChatContainer = () => {
               ref={isLastMessage ? bottomRef : null}
             >
               <div className="chat-image avatar">
-                <div
-                  className={`size-10 rounded-full ${showHeader && "border"}`}
-                >
-                  {showHeader && (
+                <div className={`size-10 rounded-full border}`}>
+                  {(showHeader || isLastMessage) && (
                     <img
                       src={
                         message.senderId === authUser._id
@@ -106,17 +104,10 @@ const ChatContainer = () => {
                   className="w-full sm:max-w-[200px] rounded-md mb-2 border-none"
                 />
               )}
-              <div className="chat-bubble">
-                {message.text && <p>{message.text}</p>}
-              </div>
 
-              {isLastMessage && message.senderId === authUser._id && (
-                <div className="chat-footer text-base-content/50">
-                  {isSendingMessage ? (
-                    <span>Sending</span>
-                  ) : (
-                    <span>Delivered</span>
-                  )}
+              {message.text.length !== 0 && (
+                <div className="chat-bubble">
+                  <p>{message.text}</p>
                 </div>
               )}
             </div>
